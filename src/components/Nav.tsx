@@ -56,7 +56,6 @@ export default function Nav() {
           </nav>
 
           <div className="hidden items-center gap-5 md:flex">
-            <span className="hidden text-xs text-black/45 xl:inline">Lagos, Nigeria</span>
             <Magnetic>
               <a href="#contact" data-cursor="SAY HI" className="button-dark min-h-10 px-5 py-2 text-xs">
                 Let's talk <span aria-hidden="true">↗</span>
