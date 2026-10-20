@@ -1,9 +1,8 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
-import Aurora from "./components/Aurora";
-import Cursor from "./components/Cursor";
-import Loader from "./components/Loader";
 import Nav from "./components/Nav";
+import Cursor from "./components/Cursor";
+import ScrollProgress from "./components/ScrollProgress";
 import Hero from "./sections/Hero";
 import Marquee from "./sections/Marquee";
 import Work from "./sections/Work";
@@ -18,11 +17,13 @@ export default function App() {
 
   useEffect(() => {
     if (reduced) return;
+
     const lenis = new Lenis({
-      duration: 1.1,
+      duration: 1,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
+
     let raf = 0;
     const loop = (time: number) => {
       lenis.raf(time);
@@ -30,18 +31,19 @@ export default function App() {
     };
     raf = requestAnimationFrame(loop);
 
-    // anchor links -> lenis
-    const onClick = (e: MouseEvent) => {
-      const a = (e.target as HTMLElement).closest('a[href^="#"]') as HTMLAnchorElement | null;
-      if (!a) return;
-      const id = a.getAttribute("href");
+    const onClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const anchor = target?.closest<HTMLAnchorElement>('a[href^="#"]');
+      const id = anchor?.getAttribute("href");
       if (!id || id === "#") return;
-      const el = document.querySelector(id);
-      if (el) {
-        e.preventDefault();
-        lenis.scrollTo(el as HTMLElement, { offset: -20 });
-      }
+
+      const section = document.querySelector<HTMLElement>(id);
+      if (!section) return;
+
+      event.preventDefault();
+      lenis.scrollTo(section, { offset: -80 });
     };
+
     document.addEventListener("click", onClick);
     return () => {
       cancelAnimationFrame(raf);
@@ -51,10 +53,9 @@ export default function App() {
   }, [reduced]);
 
   return (
-    <div className="grain relative">
-      <Loader />
+    <div className="min-h-screen bg-white text-ink-950">
       <Cursor />
-      <Aurora />
+      <ScrollProgress />
       <Nav />
       <main>
         <Hero />

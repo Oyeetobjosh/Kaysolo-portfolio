@@ -1,74 +1,78 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { process } from "../data";
-import { RevealWords } from "../components/Reveal";
-import { useMediaQuery } from "../hooks";
 
 export default function Process() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  // translate track: show 4 panels across
-  const x = useTransform(scrollYProgress, [0, 1], ["2%", "-72%"]);
-  const line = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-
-  if (!isDesktop) {
-    return (
-      <section id="process" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24">
-        <span className="font-mono text-sm text-neon-cyan">/ how I work</span>
-        <h2 className="mt-4 font-display text-5xl font-bold tracking-tight">
-          <span className="text-gradient">The process.</span>
-        </h2>
-        <div className="mt-10 space-y-5">
-          {process.map((p) => (
-            <motion.div
-              key={p.n}
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="rounded-3xl border border-white/10 bg-ink-900/60 p-7"
-            >
-              <span className="font-mono text-sm text-neon-cyan">{p.n}</span>
-              <h3 className="mt-2 font-display text-3xl font-semibold">{p.title}</h3>
-              <p className="mt-2 text-white/60">{p.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-    );
-  }
+  const trackX = useTransform(scrollYProgress, [0, 1], ["0%", "-48%"]);
+  const progress = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
-    <section id="process" ref={ref} className="relative h-[320vh] scroll-mt-24">
-      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
-        <div className="mx-auto mb-10 w-full max-w-7xl px-8">
-          <span className="font-mono text-sm text-neon-cyan">/ how I work</span>
-          <h2 className="mt-3 font-display text-6xl font-bold tracking-tight lg:text-7xl">
-            <RevealWords text="The" /> <span className="text-gradient">process.</span>
-          </h2>
-          {/* progress line */}
-          <div className="mt-6 h-[2px] w-full max-w-md overflow-hidden rounded bg-white/10">
-            <motion.div style={{ width: line }} className="h-full bg-gradient-to-r from-neon-cyan to-neon-magenta" />
-          </div>
-        </div>
-
-        <motion.div style={{ x }} className="flex gap-8 px-8">
-          {process.map((p, i) => (
-            <div
-              key={p.n}
-              className="relative w-[70vw] shrink-0 overflow-hidden rounded-[2rem] border border-white/10 bg-ink-900/60 p-12 lg:w-[46vw]"
+    <section id="process" ref={ref} className="scroll-mt-20">
+      <div className="page-wrap py-24 lg:hidden">
+        <span className="section-kicker">A considered process</span>
+        <h2 className="mt-4 max-w-2xl font-display text-4xl font-semibold leading-[0.98] tracking-[-0.055em] md:text-6xl">
+          From first thought to final detail.
+        </h2>
+        <div className="mt-10 space-y-4">
+          {process.map((step, index) => (
+            <motion.article
+              key={step.n}
+              initial={{ opacity: 0, x: -18 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-30px" }}
+              transition={{ duration: 0.55, delay: index * 0.07 }}
+              className="relative overflow-hidden border border-black/10 bg-[#f5f2ec] p-6"
             >
-              <div
-                className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full opacity-30 blur-3xl"
-                style={{ background: ["#38f5e3", "#8b5cff", "#ff3df0", "#c6ff3d"][i] }}
-              />
-              <span className="font-display text-[9rem] font-bold leading-none text-white/5">{p.n}</span>
-              <h3 className="mt-4 font-display text-5xl font-semibold tracking-tight">{p.title}</h3>
-              <p className="mt-5 max-w-md text-lg text-white/60">{p.desc}</p>
-            </div>
+              <span className="absolute right-5 top-3 font-display text-6xl font-semibold text-black/[0.06]">{step.n}</span>
+              <span className="section-kicker">Step {step.n}</span>
+              <h3 className="relative mt-3 font-display text-2xl font-semibold tracking-tight">{step.title}</h3>
+              <p className="relative mt-2 max-w-lg text-sm leading-relaxed text-black/60">{step.desc}</p>
+            </motion.article>
           ))}
-        </motion.div>
+        </div>
+      </div>
+
+      <div className="relative hidden h-[250vh] lg:block">
+        <div className="sticky top-[76px] flex h-[calc(100vh-76px)] flex-col justify-center overflow-hidden">
+          <div className="page-wrap relative z-10 mb-8">
+            <div className="flex items-end justify-between gap-8">
+              <div>
+                <span className="section-kicker">A considered process</span>
+                <h2 className="mt-3 font-display text-6xl font-semibold leading-[0.96] tracking-[-0.06em] xl:text-7xl">
+                  From first thought to final detail.
+                </h2>
+              </div>
+              <span className="hidden pb-2 font-mono text-xs text-black/45 xl:block">Scroll to move through each stage</span>
+            </div>
+            <div className="mt-6 h-px max-w-lg bg-black/10">
+              <motion.div style={{ scaleX: progress }} className="h-full origin-left bg-[#8a7959]" />
+            </div>
+          </div>
+
+          <motion.div style={{ x: trackX }} className="flex w-max gap-8 pl-[max(2rem,calc((100vw-1480px)/2+3rem))] pr-12">
+            {process.map((step, index) => (
+              <motion.article
+                key={step.n}
+                whileHover={{ y: -7, rotateZ: index % 2 === 0 ? -0.3 : 0.3 }}
+                transition={{ type: "spring", stiffness: 180, damping: 20 }}
+                className="relative flex h-[47vh] w-[46vw] max-w-[700px] shrink-0 flex-col justify-between overflow-hidden border border-black/10 bg-[#f5f2ec] p-9 xl:p-12"
+              >
+                <div className="pointer-events-none absolute -right-12 -top-16 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(172,139,92,0.2),transparent_68%)] blur-2xl" />
+                <div className="relative flex items-start justify-between">
+                  <span className="section-kicker">Step {step.n}</span>
+                  <span className="font-mono text-xs text-black/40">0{index + 1} / 04</span>
+                </div>
+                <div className="relative">
+                  <span className="font-display text-[8rem] font-semibold leading-none tracking-[-0.08em] text-black/[0.06] xl:text-[10rem]">{step.n}</span>
+                  <h3 className="mt-3 font-display text-4xl font-semibold tracking-[-0.05em] xl:text-6xl">{step.title}</h3>
+                  <p className="mt-4 max-w-md text-base leading-relaxed text-black/60 xl:text-lg">{step.desc}</p>
+                </div>
+              </motion.article>
+            ))}
+          </motion.div>
+        </div>
       </div>
     </section>
   );

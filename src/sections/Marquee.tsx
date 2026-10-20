@@ -1,33 +1,17 @@
-const items = [
-  "UI/UX Design",
-  "Branding",
-  "Graphics",
-  "Anti-Counterfeit",
-  "Design Systems",
-  "Product Design",
-  "Motion",
-  "Web3",
-];
-
-function Row({ reverse = false }: { reverse?: boolean }) {
-  return (
-    <div className="flex whitespace-nowrap">
-      <div className={`flex shrink-0 ${reverse ? "animate-marquee-rev" : "animate-marquee"}`}>
-        {[...items, ...items].map((t, i) => (
-          <span key={i} className="mx-6 flex items-center gap-6 font-display text-4xl font-semibold md:text-6xl">
-            <span className={i % 2 ? "text-white/20" : "text-white/80"}>{t}</span>
-            <span className="text-neon-cyan">✦</span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
+const items = ["Product design", "Brand identity", "Graphic design", "Digital experiences"];
 
 export default function Marquee() {
   return (
-    <section className="relative border-y border-white/10 py-8 md:py-10">
-      <Row />
+    <section aria-label="Areas of practice" className="overflow-hidden border-y border-black/10 py-6 md:py-8">
+      <p className="sr-only">Product design, brand identity, graphic design and digital experiences.</p>
+      <div className="flex w-max animate-marquee items-center motion-reduce:animate-none" aria-hidden="true">
+        {[...items, ...items, ...items, ...items].map((item, index) => (
+          <span key={`${item}-${index}`} className="mx-5 flex items-center gap-5 font-display text-2xl font-semibold tracking-tight text-black/75 md:mx-8 md:gap-8 md:text-4xl">
+            {item}
+            <span className="font-sans text-xl font-normal text-black/35 md:text-2xl">✳</span>
+          </span>
+        ))}
+      </div>
     </section>
   );
 }

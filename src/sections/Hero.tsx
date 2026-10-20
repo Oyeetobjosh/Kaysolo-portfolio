@@ -1,122 +1,97 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import InteractiveOrb from "../components/InteractiveOrb";
 import Magnetic from "../components/Magnetic";
-import { RevealWords } from "../components/Reveal";
 
-const disciplines = ["UI/UX", "Graphics", "Branding", "Security"];
+const disciplines = ["Product design", "Brand identity", "Graphic design"];
 
 export default function Hero() {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
+  const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const yTitle = useTransform(scrollYProgress, [0, 1], [0, -120]);
-  const yTag = useTransform(scrollYProgress, [0, 1], [0, -60]);
-  const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const titleY = useTransform(scrollYProgress, [0, 1], [0, -68]);
+  const orbY = useTransform(scrollYProgress, [0, 1], [0, 88]);
+  const orbScale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, -30]);
 
   return (
-    <section
-      id="top"
-      ref={ref}
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden px-5 pt-28 pb-16 md:px-8"
-    >
-      <motion.div style={{ opacity }} className="mx-auto w-full max-w-7xl">
-        {/* status pill */}
+    <section id="top" ref={ref} className="scroll-mt-20 overflow-hidden">
+      <div className="page-wrap flex min-h-screen flex-col pb-10 pt-28 md:pt-36">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-8 inline-flex items-center gap-2.5 rounded-full glass px-4 py-2 text-xs md:text-sm"
+          className="relative z-20 flex flex-wrap items-center justify-between gap-4 border-b border-black/10 pb-4"
         >
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon-lime opacity-75" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-neon-lime" />
+          <span className="section-kicker normal-case tracking-[0.12em]">Independent designer .</span>
+          <span className="inline-flex items-center gap-2 text-xs font-medium text-black/60">
+            <motion.span
+              animate={reduced ? undefined : { scale: [1, 1.65, 1], opacity: [0.85, 0.35, 0.85] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+              className="h-2 w-2 rounded-full bg-[#727653]"
+              aria-hidden="true"
+            />
+            Available for select projects
           </span>
-          <span className="text-white/80">Available for freelance & full-time</span>
-          <span className="hidden text-white/30 sm:inline">·</span>
-          <span className="hidden text-white/50 sm:inline">Lagos, Nigeria</span>
         </motion.div>
 
-        <motion.h1
-          style={{ y: yTitle, scale }}
-          className="font-display text-[15vw] font-bold leading-[0.86] tracking-tight md:text-[10.5vw] lg:text-[9vw]"
-        >
-          <span className="block overflow-hidden">
-            <RevealWords text="Full-stack" delay={0.1} />
-          </span>
-          <span className="block overflow-hidden">
-            <span className="text-gradient">
-              <RevealWords text="design." delay={0.22} />
-            </span>
-            <span className="ml-2 align-top text-[3vw] text-white/40 md:text-[1.4vw]">
-              /keɪˈsoʊloʊ/
-            </span>
-          </span>
-        </motion.h1>
+        <div className="relative flex flex-1 flex-col justify-center py-12 md:py-16">
+          <motion.div
+            style={reduced ? undefined : { y: orbY, scale: orbScale }}
+            className="pointer-events-auto absolute right-[-18%] top-[3%] z-0 h-[82vw] max-h-[560px] w-[82vw] max-w-[560px] md:right-[-3%] md:top-[1%] md:h-[52vw] md:w-[52vw]"
+          >
+            <InteractiveOrb />
+          </motion.div>
 
-        <motion.div
-          style={{ y: yTag }}
-          className="mt-8 flex flex-col gap-8 md:mt-12 md:flex-row md:items-end md:justify-between"
-        >
-          <p className="max-w-xl text-lg text-white/70 md:text-xl">
-            I'm <span className="text-white">Kaysolo</span> — a full-stack designer turning bold ideas
-            into interfaces, brands and secure, counterfeit-proof design that people actually feel.
-          </p>
+          <motion.h1
+            style={reduced ? undefined : { y: titleY }}
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduced ? 0 : 0.9, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            className="relative z-10 max-w-full font-display text-[clamp(3.25rem,10.6vw,10rem)] font-semibold leading-[0.86] tracking-[-0.075em] md:max-w-[88%]"
+          >
+            <span className="block">Design should</span>
+            <span className="block font-serif text-[1.08em] font-normal italic tracking-[-0.055em]">
+              feel like you.
+            </span>
+          </motion.h1>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <Magnetic>
-              <a
-                href="#work"
-                data-cursor="explore"
-                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 font-semibold text-ink-950"
-              >
-                View the work
-                <span className="transition-transform group-hover:translate-x-1">→</span>
+          <motion.div
+            style={reduced ? undefined : { y: copyY }}
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduced ? 0 : 0.75, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            className="relative z-20 mt-8 ml-auto w-full max-w-md lg:mr-[3%] lg:mt-[-1rem]"
+          >
+            <p className="text-lg leading-relaxed text-black/65 md:text-xl">
+              I'm Kaysolo, a product and visual designer based in Lagos. I turn good ideas into useful digital experiences and identities with clarity, character and care.
+            </p>
+            <Magnetic className="mt-7 w-fit" strength={0.24}>
+              <a href="#work" data-cursor="EXPLORE" className="button-dark">
+                View selected work <span aria-hidden="true">↘</span>
               </a>
             </Magnetic>
-            <Magnetic>
-              <a
-                href="#contact"
-                data-cursor="true"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3.5 font-semibold text-white/90 transition-colors hover:border-white/40"
-              >
-                Let's talk
-              </a>
-            </Magnetic>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
-        {/* discipline strip */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
-          className="mt-14 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6"
-        >
-          {disciplines.map((d, i) => (
-            <div key={d} className="flex items-center gap-3">
-              <span className="font-mono text-xs text-neon-cyan">0{i + 1}</span>
-              <span className="font-display text-base font-medium text-white/80 md:text-lg">{d}</span>
-            </div>
+        <div className="grid grid-cols-1 gap-5 border-t border-black/10 pt-5 sm:grid-cols-2 lg:grid-cols-4">
+          {disciplines.map((discipline, index) => (
+            <motion.div
+              key={discipline}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.42 + index * 0.08 }}
+              className="flex items-center gap-3"
+            >
+              <span className="font-mono text-[10px] text-black/40">0{index + 1}</span>
+              <span className="text-sm font-medium">{discipline}</span>
+            </motion.div>
           ))}
-        </motion.div>
-      </motion.div>
-
-      {/* scroll cue */}
-      <motion.div
-        style={{ opacity }}
-        className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2"
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          className="flex flex-col items-center gap-2 text-white/40"
-        >
-          <span className="font-mono text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-          <div className="h-9 w-5 rounded-full border border-white/20 p-1">
-            <div className="mx-auto h-2 w-1 rounded-full bg-white/60" />
-          </div>
-        </motion.div>
-      </motion.div>
+          <a href="#work" data-cursor="SCROLL" className="hidden items-center justify-end gap-2 text-xs font-medium text-black/55 transition-colors hover:text-black lg:flex">
+            Scroll to explore <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,61 +1,72 @@
 import { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useMediaQuery } from "../hooks";
 
 export default function Cursor() {
-  const canHover = useMediaQuery("(hover: hover) and (pointer: fine)");
+  const [enabled, setEnabled] = useState(false);
+  const [active, setActive] = useState(false);
+  const [label, setLabel] = useState<string | null>(null);
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const ringX = useSpring(x, { stiffness: 350, damping: 28, mass: 0.5 });
-  const ringY = useSpring(y, { stiffness: 350, damping: 28, mass: 0.5 });
-  const [hovering, setHovering] = useState(false);
-  const [label, setLabel] = useState<string | null>(null);
+  const ringX = useSpring(x, { stiffness: 360, damping: 30, mass: 0.45 });
+  const ringY = useSpring(y, { stiffness: 360, damping: 30, mass: 0.45 });
 
   useEffect(() => {
-    if (!canHover) return;
-    const move = (e: MouseEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
-      const el = e.target as HTMLElement;
-      const interactive = el.closest("a,button,[data-cursor]");
-      setHovering(!!interactive);
-      const l = interactive?.getAttribute("data-cursor");
-      setLabel(l && l !== "true" ? l : null);
+    const media = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setEnabled(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const move = (event: MouseEvent) => {
+      x.set(event.clientX);
+      y.set(event.clientY);
+      const target = (event.target as HTMLElement | null)?.closest("a, button, [data-cursor]") as HTMLElement | null;
+      const cursorLabel = target?.getAttribute("data-cursor");
+      setActive(Boolean(target));
+      setLabel(cursorLabel && cursorLabel !== "true" ? cursorLabel : null);
+    };
+    const leave = () => {
+      setActive(false);
+      setLabel(null);
     };
     window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, [canHover, x, y]);
+    document.documentElement.addEventListener("mouseleave", leave);
+    return () => {
+      window.removeEventListener("mousemove", move);
+      document.documentElement.removeEventListener("mouseleave", leave);
+    };
+  }, [enabled, x, y]);
 
-  if (!canHover) return null;
+  if (!enabled) return null;
 
   return (
     <>
       <motion.div
-        className="pointer-events-none fixed z-[100] hidden md:block"
+        className="pointer-events-none fixed left-0 top-0 z-[100] hidden md:block"
         style={{ x, y, translateX: "-50%", translateY: "-50%" }}
       >
-        <div className="h-1.5 w-1.5 rounded-full bg-neon-cyan" />
+        <span className="block h-1.5 w-1.5 rounded-full bg-[#615f43]" />
       </motion.div>
       <motion.div
-        className="pointer-events-none fixed z-[100] hidden md:flex items-center justify-center"
+        className="pointer-events-none fixed left-0 top-0 z-[99] hidden md:flex items-center justify-center"
         style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%" }}
       >
-        <motion.div
+        <motion.span
           animate={{
-            width: hovering ? 64 : 34,
-            height: hovering ? 64 : 34,
-            borderColor: hovering ? "rgba(56,245,227,0.9)" : "rgba(139,92,255,0.5)",
-            backgroundColor: hovering ? "rgba(56,245,227,0.08)" : "rgba(139,92,255,0)",
+            width: active ? 72 : 36,
+            height: active ? 72 : 36,
+            borderColor: active ? "rgba(120, 111, 77, 0.7)" : "rgba(99, 97, 70, 0.38)",
+            backgroundColor: active ? "rgba(188, 145, 91, 0.13)" : "rgba(188, 145, 91, 0)",
           }}
-          transition={{ type: "spring", stiffness: 300, damping: 22 }}
-          className="rounded-full border flex items-center justify-center"
+          transition={{ type: "spring", stiffness: 280, damping: 24 }}
+          className="flex items-center justify-center rounded-full border"
+          style={{ mixBlendMode: "multiply" }}
         >
-          {label && (
-            <span className="font-mono text-[10px] uppercase tracking-wider text-neon-cyan">
-              {label}
-            </span>
-          )}
-        </motion.div>
+          {label && <span className="px-2 font-mono text-[9px] uppercase tracking-[0.08em] text-black">{label}</span>}
+        </motion.span>
       </motion.div>
     </>
   );
