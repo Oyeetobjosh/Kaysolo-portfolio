@@ -17,22 +17,15 @@ export default function About() {
         >
           <div className="aspect-[4/5] overflow-hidden bg-neutral-100">
             <img
-              src="/portrait.png"
+              src="/portrait.jpg"
               alt="Portrait artwork of Kaysolo"
               loading="lazy"
-              className="h-full w-full object-cover object-top grayscale transition-transform duration-700 hover:scale-[1.02]"
-              onError={(event) => {
-                const image = event.currentTarget;
-                if (!image.dataset.fallback) {
-                  image.dataset.fallback = "1";
-                  image.src = "/portrait.jpg";
-                }
-              }}
+              className="h-full w-full object-cover object-top transition-transform duration-700 hover:scale-[1.02]"
             />
           </div>
           <figcaption className="mt-3 flex items-center justify-between border-t border-black/10 pt-3 text-xs text-black/55">
             <span>Kaysolo</span>
-            <span>Lagos, Nigeria</span>
+            <span>Nigeria</span>
           </figcaption>
         </motion.figure>
 
@@ -52,7 +45,7 @@ export default function About() {
 
           <div className="mt-7 max-w-2xl space-y-4 text-base leading-relaxed text-black/65 md:text-lg">
             <p>
-              I'm Kaysolo, a product and visual designer based in Lagos, Nigeria. I work across digital products, brand identity and graphic design, helping people make their ideas clear and memorable.
+              I'm Kaysolo, a product and visual designer based in Nigeria. I work across digital products, brand identity and graphic design, helping people make their ideas clear and memorable.
             </p>
             <p>
               I care about more than how a screen or identity looks. I think about how it works, how it feels and the small details that make it useful.

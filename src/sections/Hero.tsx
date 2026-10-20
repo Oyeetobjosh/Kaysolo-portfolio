@@ -64,7 +64,7 @@ export default function Hero() {
             className="relative z-20 mt-8 ml-auto w-full max-w-md lg:mr-[3%] lg:mt-[-1rem]"
           >
             <p className="text-lg leading-relaxed text-black/65 md:text-xl">
-              I'm Kaysolo, a product and visual designer based in Lagos. I turn good ideas into useful digital experiences and identities with clarity, character and care.
+              I'm Kaysolo, a product and visual designer based in Nigeria. I turn good ideas into useful digital experiences and identities with clarity, character and care.
             </p>
             <Magnetic className="mt-7 w-fit" strength={0.24}>
               <a href="#work" data-cursor="EXPLORE" className="button-dark">
