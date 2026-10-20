@@ -1,29 +1,29 @@
-import { useRef, ReactNode } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useMediaQuery } from "../hooks";
+import { useRef, type ReactNode } from "react";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 
 export default function Magnetic({
   children,
-  strength = 0.35,
+  strength = 0.22,
   className = "",
 }: {
   children: ReactNode;
   strength?: number;
   className?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const canHover = useMediaQuery("(hover: hover) and (pointer: fine)");
+  const host = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 200, damping: 15, mass: 0.3 });
-  const sy = useSpring(y, { stiffness: 200, damping: 15, mass: 0.3 });
+  const springX = useSpring(x, { stiffness: 190, damping: 18, mass: 0.32 });
+  const springY = useSpring(y, { stiffness: 190, damping: 18, mass: 0.32 });
 
-  const onMove = (e: React.MouseEvent) => {
-    if (!canHover || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    x.set((e.clientX - (r.left + r.width / 2)) * strength);
-    y.set((e.clientY - (r.top + r.height / 2)) * strength);
+  const move = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (reduced || event.pointerType !== "mouse" || !host.current) return;
+    const bounds = host.current.getBoundingClientRect();
+    x.set((event.clientX - bounds.left - bounds.width / 2) * strength);
+    y.set((event.clientY - bounds.top - bounds.height / 2) * strength);
   };
+
   const reset = () => {
     x.set(0);
     y.set(0);
@@ -31,10 +31,10 @@ export default function Magnetic({
 
   return (
     <motion.div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={reset}
-      style={{ x: sx, y: sy }}
+      ref={host}
+      onPointerMove={move}
+      onPointerLeave={reset}
+      style={reduced ? undefined : { x: springX, y: springY }}
       className={className}
     >
       {children}

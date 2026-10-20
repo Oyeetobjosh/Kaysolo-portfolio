@@ -1,95 +1,78 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import Magnetic from "../components/Magnetic";
-import { RevealWords } from "../components/Reveal";
 
 const socials = [
   { label: "Behance", href: "https://www.behance.net/odewolekehinde" },
-  { label: "Twitter / X", href: "https://twitter.com/Kaysolo_1" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/" },
+  { label: "X / Twitter", href: "https://twitter.com/Kaysolo_1" },
   { label: "Email", href: "mailto:hello@kaysolo.design" },
 ];
 
 export default function Contact() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end end"] });
-  const y = useTransform(scrollYProgress, [0, 1], [80, 0]);
-
   return (
-    <section id="contact" ref={ref} className="relative scroll-mt-24 px-5 py-24 md:px-8 md:py-36">
-      <motion.div
-        style={{ y }}
-        className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] border border-white/10 bg-ink-900/60 p-8 md:p-16"
-      >
-        <div
-          className="pointer-events-none absolute inset-0 opacity-70"
-          style={{
-            background:
-              "radial-gradient(50% 60% at 20% 0%, rgba(139,92,255,0.35), transparent 60%), radial-gradient(50% 60% at 90% 100%, rgba(56,245,227,0.25), transparent 60%)",
-          }}
-        />
-        <div className="relative">
-          <span className="font-mono text-sm text-neon-cyan">/ let's build</span>
-          <h2 className="mt-4 font-display text-5xl font-bold leading-[0.95] tracking-tight md:text-8xl">
-            <RevealWords text="Got a project" />
-            <br />
-            <span className="text-gradient">
-              <RevealWords text="worth designing?" delay={0.15} />
-            </span>
-          </h2>
-          <p className="mt-6 max-w-xl text-lg text-white/70">
-            Whether it's a product, a full rebrand, or security design that can't be faked — let's make
-            something people can't scroll past.
-          </p>
-
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Magnetic strength={0.4}>
-              <a
-                href="mailto:hello@kaysolo.design"
-                data-cursor="email me"
-                className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-lg font-semibold text-ink-950"
-              >
-                Start a project
-                <span className="transition-transform group-hover:translate-x-1">→</span>
+    <section id="contact" className="scroll-mt-24 border-t border-black/10 py-20 md:py-28">
+      <div className="page-wrap">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.65 }}
+            className="lg:col-span-8"
+          >
+            <span className="section-kicker">Have a project in mind?</span>
+            <h2 className="mt-4 font-display text-5xl font-semibold leading-[0.93] tracking-[-0.06em] md:text-8xl">
+              Let's make
+              <br />
+              <span className="font-serif font-normal italic">something meaningful.</span>
+            </h2>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.65, delay: 0.1 }}
+            className="max-w-sm lg:col-span-4 lg:justify-self-end"
+          >
+            <p className="text-base leading-relaxed text-black/60 md:text-lg">
+              Looking for a thoughtful designer for your next idea? Send a note or explore the work on Behance.
+            </p>
+            <Magnetic className="mt-6 w-fit" strength={0.2}>
+              <a href="mailto:hello@kaysolo.design" data-cursor="EMAIL" className="button-dark">
+                Start a conversation <span aria-hidden="true">↗</span>
               </a>
             </Magnetic>
-            <Magnetic>
-              <a
-                href="https://www.behance.net/odewolekehinde"
-                target="_blank"
-                rel="noreferrer"
-                data-cursor="true"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 px-8 py-4 text-lg font-semibold transition-colors hover:border-white/50"
-              >
-                See full Behance
-              </a>
-            </Magnetic>
-          </div>
-
-          <div className="mt-14 grid grid-cols-2 gap-3 border-t border-white/10 pt-10 md:grid-cols-4">
-            {socials.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                target="_blank"
-                rel="noreferrer"
-                data-cursor="true"
-                className="group flex items-center justify-between rounded-2xl border border-white/10 px-5 py-4 transition-colors hover:border-white/30 hover:bg-white/5"
-              >
-                <span className="text-white/80">{s.label}</span>
-                <span className="text-white/40 transition-all group-hover:translate-x-1 group-hover:text-neon-cyan">
-                  ↗
-                </span>
-              </a>
-            ))}
-          </div>
+          </motion.div>
         </div>
-      </motion.div>
 
-      <footer className="mx-auto mt-16 flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-white/40 md:flex-row">
-        <span>© {new Date().getFullYear()} Kaysolo. Designed with intent.</span>
-        <span className="font-mono">Lagos · Nigeria — available worldwide</span>
-      </footer>
+        <div className="mt-16 grid grid-cols-1 border-y border-black/10 sm:grid-cols-3">
+          {socials.map((social, index) => {
+            const external = social.href.startsWith("http");
+            return (
+              <motion.a
+                key={social.label}
+                href={social.href}
+                target={external ? "_blank" : undefined}
+                rel={external ? "noreferrer" : undefined}
+                data-cursor={social.label.toUpperCase()}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+                whileHover={{ x: 5 }}
+                className="group flex items-center justify-between border-b border-black/10 py-4 text-sm font-medium transition-colors hover:text-black/55 last:border-b-0 sm:border-b-0 sm:border-r sm:px-5 sm:first:pl-0 sm:last:border-r-0"
+              >
+                {social.label}
+                <span className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true">↗</span>
+              </motion.a>
+            );
+          })}
+        </div>
+
+        <footer className="mt-8 flex flex-col justify-between gap-3 text-xs text-black/45 sm:flex-row sm:items-center">
+          <span>© {new Date().getFullYear()} Kaysolo. Designed with intent.</span>
+          <span>Lagos, Nigeria · Available worldwide</span>
+        </footer>
+      </div>
     </section>
   );
 }

@@ -2,70 +2,67 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { projects } from "../data";
 import ProjectCard from "../components/ProjectCard";
-import Reveal, { RevealWords } from "../components/Reveal";
 
-const filters = ["All", "UI/UX", "Branding", "Graphics", "Security"];
+const filters = ["All projects", "Product design", "Brand identity", "Visual design"];
 
 export default function Work() {
-  const [active, setActive] = useState("All");
+  const [active, setActive] = useState("All projects");
   const list = useMemo(
-    () => (active === "All" ? projects : projects.filter((p) => p.category === active)),
+    () => (active === "All projects" ? projects : projects.filter((project) => project.category === active)),
     [active]
   );
 
   return (
-    <section id="work" className="relative mx-auto max-w-7xl scroll-mt-24 px-5 py-24 md:px-8 md:py-32">
-      <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
-        <div>
-          <Reveal>
-            <span className="font-mono text-sm text-neon-cyan">/ selected work</span>
-          </Reveal>
-          <h2 className="mt-4 font-display text-5xl font-bold tracking-tight md:text-7xl">
-            <RevealWords text="Work that" />
-            <br />
-            <span className="text-gradient">
-              <RevealWords text="ships & sticks." delay={0.15} />
-            </span>
+    <section id="work" className="page-wrap scroll-mt-24 py-24 md:py-32">
+      <div className="grid grid-cols-1 items-end gap-7 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          <span className="section-kicker">Selected work</span>
+          <h2 className="mt-4 max-w-3xl font-display text-5xl font-semibold leading-[0.98] tracking-[-0.055em] md:text-7xl">
+            A selection of good ideas.
           </h2>
         </div>
-        <Reveal delay={0.2}>
-          <p className="max-w-sm text-white/60">
-            A slice of recent projects across product, brand and security design. Tap any card to open
-            the full case on Behance.
+        <div className="max-w-md lg:col-span-5 lg:justify-self-end">
+          <p className="text-base leading-relaxed text-black/60 md:text-lg">
+            Each image belongs to the project it opens. Browse the full design on Kaysolo's Behance profile.
           </p>
-        </Reveal>
+          <a
+            href="https://www.behance.net/odewolekehinde"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex items-center gap-2 border-b border-black pb-1 text-sm font-semibold"
+          >
+            Visit Behance profile <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </div>
 
-      {/* filters */}
-      <Reveal delay={0.1}>
-        <div className="mt-10 flex flex-wrap gap-2">
-          {filters.map((f) => (
-            <button
-              key={f}
-              onClick={() => setActive(f)}
-              data-cursor="true"
-              className={`relative rounded-full px-5 py-2.5 text-sm font-medium transition-colors ${
-                active === f ? "text-ink-950" : "text-white/70 hover:text-white"
-              }`}
-            >
-              {active === f && (
-                <motion.span
-                  layoutId="filter-pill"
-                  className="absolute inset-0 rounded-full bg-white"
-                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                />
-              )}
-              <span className="relative z-10">{f}</span>
-            </button>
-          ))}
+      <div className="mt-10 overflow-x-auto pb-2">
+        <div role="group" aria-label="Filter projects" className="flex min-w-max gap-2">
+          {filters.map((filter) => {
+            const selected = active === filter;
+            return (
+              <button
+                key={filter}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setActive(filter)}
+                className={`rounded-full border px-4 py-2.5 text-sm font-medium transition-colors duration-200 ${
+                  selected
+                    ? "border-black bg-black text-white"
+                    : "border-black/15 bg-white text-black/65 hover:border-black hover:text-black"
+                }`}
+              >
+                {filter}
+              </button>
+            );
+          })}
         </div>
-      </Reveal>
+      </div>
 
-      {/* grid */}
-      <motion.div layout className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <motion.div layout className="mt-9 grid grid-cols-1 gap-x-7 gap-y-12 md:grid-cols-2 md:gap-y-16">
         <AnimatePresence mode="popLayout">
-          {list.map((p, i) => (
-            <ProjectCard key={p.id} project={p} index={i} />
+          {list.map((project, index) => (
+            <ProjectCard key={project.id} project={project} index={index} />
           ))}
         </AnimatePresence>
       </motion.div>
