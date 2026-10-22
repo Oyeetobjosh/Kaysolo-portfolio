@@ -5,22 +5,21 @@ import Magnetic from "../components/Magnetic";
 
 const disciplines = ["Product design", "Brand identity", "Graphic design"];
 
-export default function Hero() {
+export default function Hero({ ready = true }: { ready?: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const titleY = useTransform(scrollYProgress, [0, 1], [0, -68]);
-  const orbY = useTransform(scrollYProgress, [0, 1], [0, 88]);
-  const orbScale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
-  const copyY = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, -36]);
+  const orbY = useTransform(scrollYProgress, [0, 1], [0, -20]);
+  const orbScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
   return (
     <section id="top" ref={ref} className="scroll-mt-20 overflow-hidden">
-      <div className="page-wrap flex min-h-screen flex-col pb-10 pt-28 md:pt-36">
+      <div className="page-wrap flex min-h-screen flex-col pb-10 pt-28 md:pt-32">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           className="relative z-20 flex flex-wrap items-center justify-between gap-4 border-b border-black/10 pb-4"
         >
           <span className="section-kicker normal-case tracking-[0.12em]">Independent designer .</span>
@@ -35,43 +34,43 @@ export default function Hero() {
           </span>
         </motion.div>
 
-        <div className="relative flex flex-1 flex-col justify-center py-12 md:py-16">
-          <motion.div
-            style={reduced ? undefined : { y: orbY, scale: orbScale }}
-            className="pointer-events-auto absolute right-[-18%] top-[3%] z-0 h-[82vw] max-h-[560px] w-[82vw] max-w-[560px] md:right-[-3%] md:top-[1%] md:h-[52vw] md:w-[52vw]"
-          >
-            <InteractiveOrb />
-          </motion.div>
+        <div className="relative flex flex-1 items-center py-8 md:py-10">
+          <div className="grid w-full grid-cols-1 items-center gap-8 md:grid-cols-12 md:gap-6">
+            <motion.div
+              style={reduced ? undefined : { y: contentY }}
+              initial={reduced ? false : { opacity: 0, y: 18 }}
+              animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+              transition={{ duration: reduced ? 0 : 0.85, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="pointer-events-none relative z-20 md:col-span-5"
+            >
+              <h1 className="w-full font-display text-[clamp(2.55rem,5.35vw,5.25rem)] font-semibold leading-[0.9] tracking-[-0.07em] md:w-[138%] lg:w-[162%]">
+                <span className="block lg:whitespace-nowrap">Bringing growth through</span>
+                <span className="mt-1 block font-serif text-[1.1em] font-normal italic leading-[0.94] tracking-[-0.05em] lg:whitespace-nowrap">
+                  outstanding design.
+                </span>
+              </h1>
 
-          <motion.h1
-            style={reduced ? undefined : { y: titleY }}
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: reduced ? 0 : 0.9, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="relative z-10 max-w-full font-display text-[clamp(3.25rem,10.6vw,10rem)] font-semibold leading-[0.86] tracking-[-0.075em] md:max-w-[88%]"
-          >
-            <span className="block">Design should</span>
-            <span className="block font-serif text-[1.08em] font-normal italic tracking-[-0.055em]">
-              feel like you.
-            </span>
-          </motion.h1>
+              <p className="pointer-events-auto mt-6 max-w-md text-base leading-relaxed text-black/65 md:text-lg">
+                I'm Kaysolo, a product and visual designer based in Nigeria. I turn good ideas into useful digital experiences and identities with clarity, character and care.
+              </p>
 
-          <motion.div
-            style={reduced ? undefined : { y: copyY }}
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: reduced ? 0 : 0.75, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            className="relative z-20 mt-8 ml-auto w-full max-w-md lg:mr-[3%] lg:mt-[-1rem]"
-          >
-            <p className="text-lg leading-relaxed text-black/65 md:text-xl">
-              I'm Kaysolo, a product and visual designer based in Nigeria. I turn good ideas into useful digital experiences and identities with clarity, character and care.
-            </p>
-            <Magnetic className="mt-7 w-fit" strength={0.24}>
-              <a href="#work" data-cursor="EXPLORE" className="button-dark">
-                View selected work <span aria-hidden="true">↘</span>
-              </a>
-            </Magnetic>
-          </motion.div>
+              <Magnetic className="pointer-events-auto mt-7 w-fit" strength={0.24}>
+                <a href="#work" data-cursor="EXPLORE" className="button-dark">
+                  View selected work <span aria-hidden="true">↘</span>
+                </a>
+              </Magnetic>
+            </motion.div>
+
+            <motion.div
+              style={reduced ? undefined : { y: orbY, scale: orbScale }}
+              initial={reduced ? false : { opacity: 0, scale: 0.94 }}
+              animate={ready ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.94 }}
+              transition={{ duration: reduced ? 0 : 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="pointer-events-auto relative z-10 h-[340px] w-full sm:h-[420px] md:col-span-7 md:-mr-4 md:h-[min(66vh,520px)] md:w-[calc(100%+1rem)] lg:-mr-8 lg:h-[min(70vh,600px)] lg:w-[calc(100%+2rem)] xl:h-[min(74vh,650px)]"
+            >
+              <InteractiveOrb />
+            </motion.div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-5 border-t border-black/10 pt-5 sm:grid-cols-2 lg:grid-cols-4">

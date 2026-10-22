@@ -1,6 +1,5 @@
-import { lazy, Suspense, useCallback, useState } from "react";
-
-const OrbCanvas = lazy(() => import("./OrbCanvas"));
+import { useCallback, useState } from "react";
+import OrbCanvas from "./OrbCanvas";
 
 export default function InteractiveOrb() {
   const [ready, setReady] = useState(false);
@@ -18,9 +17,7 @@ export default function InteractiveOrb() {
         <div className="orb-fallback-ring orb-fallback-ring-two" />
         <div className="orb-fallback-core" />
       </div>
-      <Suspense fallback={null}>
-        <OrbCanvas onReady={onReady} />
-      </Suspense>
+      <OrbCanvas onReady={onReady} />
     </div>
   );
 }

@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Lenis from "lenis";
 import Nav from "./components/Nav";
 import Cursor from "./components/Cursor";
 import ScrollProgress from "./components/ScrollProgress";
+import IntroLoader from "./components/IntroLoader";
 import Hero from "./sections/Hero";
 import Marquee from "./sections/Marquee";
 import Work from "./sections/Work";
@@ -14,6 +15,8 @@ import { usePrefersReducedMotion } from "./hooks";
 
 export default function App() {
   const reduced = usePrefersReducedMotion();
+  const [loading, setLoading] = useState(true);
+  const handleLoaderComplete = useCallback(() => setLoading(false), []);
 
   useEffect(() => {
     if (reduced) return;
@@ -55,10 +58,11 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white text-ink-950">
       <Cursor />
+      <IntroLoader open={loading} onComplete={handleLoaderComplete} />
       <ScrollProgress />
       <Nav />
       <main>
-        <Hero />
+        <Hero ready={!loading} />
         <Marquee />
         <Work />
         <Services />

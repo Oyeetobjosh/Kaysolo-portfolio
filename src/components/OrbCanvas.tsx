@@ -84,12 +84,18 @@ function createGlowTexture() {
   return texture;
 }
 
-type Satellite = {
-  mesh: THREE.Mesh;
-  radius: number;
-  speed: number;
-  phase: number;
-  lean: number;
+type OrbitTrack = {
+  group: THREE.Group;
+  ring: THREE.Mesh;
+  baseRotation: [number, number, number];
+  wobbleSpeed: number;
+  wobblePhase: number;
+  satellites: {
+    mesh: THREE.Mesh;
+    radius: number;
+    speed: number;
+    phase: number;
+  }[];
 };
 
 export default function OrbCanvas({ onReady }: { onReady: () => void }) {
@@ -121,7 +127,7 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
-    camera.position.set(0, 0, 5.25);
+    camera.position.set(0, 0, 5.6);
 
     const root = new THREE.Group();
     scene.add(root);
@@ -139,14 +145,14 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
 
     const glowTexture = createGlowTexture();
     const glow = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: glowTexture, transparent: true, depthWrite: false, opacity: 0.95 })
+      new THREE.SpriteMaterial({ map: glowTexture, transparent: true, depthWrite: false, opacity: 0.92 })
     );
     glow.position.set(0, 0, -1.6);
-    glow.scale.set(4.5, 4.5, 1);
+    glow.scale.set(4.1, 4.1, 1);
     root.add(glow);
 
     const earthTexture = createEarthTexture();
-    const globeGeometry = new THREE.SphereGeometry(1.13, 64, 48);
+    const globeGeometry = new THREE.SphereGeometry(1.18, 64, 48);
     const basePositions = Float32Array.from(globeGeometry.attributes.position.array as ArrayLike<number>);
     const globeMaterial = new THREE.MeshPhysicalMaterial({
       map: earthTexture,
@@ -160,7 +166,7 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
     root.add(globe);
 
     const atmosphere = new THREE.Mesh(
-      new THREE.SphereGeometry(1.22, 48, 40),
+      new THREE.SphereGeometry(1.27, 48, 40),
       new THREE.MeshBasicMaterial({
         color: 0xb48a61,
         transparent: true,
@@ -171,61 +177,109 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
     );
     root.add(atmosphere);
 
-    const outerRing = new THREE.Mesh(
-      new THREE.TorusGeometry(1.65, 0.009, 8, 180),
-      new THREE.MeshStandardMaterial({ color: 0x6f7957, metalness: 0.48, roughness: 0.32, transparent: true, opacity: 0.72 })
-    );
-    outerRing.rotation.set(1.05, 0.2, 0.12);
-    root.add(outerRing);
-
-    const crossingRing = new THREE.Mesh(
-      new THREE.TorusGeometry(1.81, 0.006, 8, 180),
-      new THREE.MeshStandardMaterial({ color: 0xb47d5a, metalness: 0.42, roughness: 0.38, transparent: true, opacity: 0.52 })
-    );
-    crossingRing.rotation.set(0.58, 1.08, 0.75);
-    root.add(crossingRing);
-
-    const satelliteSpecs = [
-      { color: 0x6f7957, radius: 1.77, speed: 0.42, phase: 0.4, lean: 0.7, size: 0.075 },
-      { color: 0xb7795a, radius: 1.95, speed: -0.31, phase: 2.2, lean: 1.04, size: 0.052 },
-      { color: 0xd2a86d, radius: 1.68, speed: 0.24, phase: 4.5, lean: 0.43, size: 0.043 },
+    const orbitConfigs = [
+      {
+        radius: 1.86,
+        tube: 0.01,
+        color: 0x6f7957,
+        opacity: 0.76,
+        rotation: [1.16, 0.12, -0.18] as [number, number, number],
+        wobbleSpeed: 0.46,
+        wobblePhase: 0,
+        moons: [
+          { color: 0x6f7957, speed: 0.44, phase: 0.4, size: 0.08 },
+          { color: 0xd2a86d, speed: 0.44, phase: 3.6, size: 0.044 },
+        ],
+      },
+      {
+        radius: 2.16,
+        tube: 0.008,
+        color: 0xb47d5a,
+        opacity: 0.62,
+        rotation: [1.06, -0.2, 0.34] as [number, number, number],
+        wobbleSpeed: 0.37,
+        wobblePhase: 1.9,
+        moons: [{ color: 0xb7795a, speed: -0.33, phase: 2.1, size: 0.062 }],
+      },
+      {
+        radius: 2.46,
+        tube: 0.0065,
+        color: 0xc89f68,
+        opacity: 0.48,
+        rotation: [1.24, 0.08, -0.08] as [number, number, number],
+        wobbleSpeed: 0.3,
+        wobblePhase: 3.7,
+        moons: [{ color: 0xd2a86d, speed: 0.25, phase: 4.7, size: 0.052 }],
+      },
     ];
-    const satellites: Satellite[] = satelliteSpecs.map((spec) => {
-      const mesh = new THREE.Mesh(
-        new THREE.SphereGeometry(spec.size, 20, 16),
-        new THREE.MeshPhysicalMaterial({
-          color: spec.color,
-          roughness: 0.22,
-          metalness: 0.16,
-          clearcoat: 0.9,
-          emissive: spec.color,
-          emissiveIntensity: 0.12,
+
+    const orbitTracks: OrbitTrack[] = orbitConfigs.map((cfg) => {
+      const group = new THREE.Group();
+      group.rotation.set(cfg.rotation[0], cfg.rotation[1], cfg.rotation[2]);
+      root.add(group);
+
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(cfg.radius, cfg.tube, 10, 200),
+        new THREE.MeshStandardMaterial({
+          color: cfg.color,
+          metalness: 0.46,
+          roughness: 0.34,
+          transparent: true,
+          opacity: cfg.opacity,
         })
       );
-      root.add(mesh);
-      return { mesh, radius: spec.radius, speed: spec.speed, phase: spec.phase, lean: spec.lean };
+      group.add(ring);
+
+      const satellites = cfg.moons.map((moon) => {
+        const mesh = new THREE.Mesh(
+          new THREE.SphereGeometry(moon.size, 20, 16),
+          new THREE.MeshPhysicalMaterial({
+            color: moon.color,
+            roughness: 0.22,
+            metalness: 0.16,
+            clearcoat: 0.9,
+            emissive: moon.color,
+            emissiveIntensity: 0.14,
+          })
+        );
+        group.add(mesh);
+        return { mesh, radius: cfg.radius, speed: moon.speed, phase: moon.phase };
+      });
+
+      return {
+        group,
+        ring,
+        baseRotation: cfg.rotation,
+        wobbleSpeed: cfg.wobbleSpeed,
+        wobblePhase: cfg.wobblePhase,
+        satellites,
+      };
     });
 
-    const setSatellitePosition = (satellite: Satellite, time: number) => {
-      const angle = time * satellite.speed + satellite.phase;
-      satellite.mesh.position.set(
-        Math.cos(angle) * satellite.radius,
-        Math.sin(angle) * satellite.radius * Math.sin(satellite.lean) * 0.56,
-        Math.sin(angle) * satellite.radius * Math.cos(satellite.lean)
-      );
+    const updateTrackSatellites = (time: number) => {
+      orbitTracks.forEach((track) => {
+        track.satellites.forEach((satellite) => {
+          const angle = time * satellite.speed + satellite.phase;
+          satellite.mesh.position.set(
+            Math.cos(angle) * satellite.radius,
+            Math.sin(angle) * satellite.radius,
+            0
+          );
+        });
+      });
     };
-    satellites.forEach((satellite) => setSatellitePosition(satellite, 0));
+    updateTrackSatellites(0);
 
     const random = seededRandom(9191);
-    const pointCount = 130;
+    const pointCount = 150;
     const pointPositions = new Float32Array(pointCount * 3);
     for (let index = 0; index < pointCount; index += 1) {
       const vertical = random() * 2 - 1;
       const angle = random() * Math.PI * 2;
-      const radius = 1.95 + random() * 0.58;
+      const radius = 1.45 + random() * 0.95;
       const spread = Math.sqrt(1 - vertical * vertical);
       pointPositions[index * 3] = Math.cos(angle) * spread * radius;
-      pointPositions[index * 3 + 1] = vertical * radius;
+      pointPositions[index * 3 + 1] = vertical * radius * 0.56;
       pointPositions[index * 3 + 2] = Math.sin(angle) * spread * radius;
     }
     const pointGeometry = new THREE.BufferGeometry();
@@ -247,7 +301,10 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
       const width = Math.max(1, element.clientWidth);
       const height = Math.max(1, element.clientHeight);
       camera.aspect = width / height;
-      camera.position.z = width < 360 ? 5.7 : 5.25;
+      const halfTan = Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5));
+      const zForHeight = 1.68 / halfTan;
+      const zForWidth = 2.66 / (camera.aspect * halfTan);
+      camera.position.z = Math.max(zForHeight, zForWidth);
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
       renderer.render(scene, camera);
@@ -256,11 +313,16 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
     const renderFrame = (timestamp: number) => {
       const time = timestamp * 0.001;
       if (!reducedMotion) {
-        root.rotation.x += (targetX + Math.sin(time * 0.42) * 0.055 - root.rotation.x) * 0.035;
-        root.rotation.y += (targetY + Math.sin(time * 0.14) * 0.24 + scrollTurn - root.rotation.y) * 0.035;
-        root.position.y = Math.sin(time * 0.78) * 0.055;
-        outerRing.rotation.z += 0.0018;
-        crossingRing.rotation.x -= 0.0011;
+        root.rotation.x += (targetX + Math.sin(time * 0.42) * 0.045 - root.rotation.x) * 0.035;
+        root.rotation.y += (targetY + Math.sin(time * 0.16) * 0.22 + scrollTurn - root.rotation.y) * 0.035;
+        root.position.y = Math.sin(time * 0.78) * 0.045;
+        globe.rotation.y = time * 0.14;
+
+        orbitTracks.forEach((track) => {
+          track.group.rotation.x = track.baseRotation[0] + Math.sin(time * track.wobbleSpeed + track.wobblePhase) * 0.045;
+          track.group.rotation.z = track.baseRotation[2] + Math.cos(time * track.wobbleSpeed * 0.8 + track.wobblePhase) * 0.04;
+        });
+
         points.rotation.y -= 0.0014;
 
         const positions = globeGeometry.attributes.position as THREE.BufferAttribute;
@@ -274,7 +336,7 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
         }
         positions.needsUpdate = true;
         globeGeometry.computeVertexNormals();
-        satellites.forEach((satellite) => setSatellitePosition(satellite, time));
+        updateTrackSatellites(time);
       }
       renderer.render(scene, camera);
     };
@@ -296,8 +358,8 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
 
     const onPointerMove = (event: PointerEvent) => {
       const bounds = element.getBoundingClientRect();
-      targetX = ((event.clientY - bounds.top) / bounds.height - 0.5) * 0.54;
-      targetY = ((event.clientX - bounds.left) / bounds.width - 0.5) * 0.86;
+      targetX = ((event.clientY - bounds.top) / bounds.height - 0.5) * 0.34;
+      targetY = ((event.clientX - bounds.left) / bounds.width - 0.5) * 0.62;
       start();
     };
     const onPointerLeave = () => {
@@ -305,7 +367,7 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
       targetY = 0;
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      const step = 0.18;
+      const step = 0.14;
       if (event.key === "ArrowLeft") targetY -= step;
       else if (event.key === "ArrowRight") targetY += step;
       else if (event.key === "ArrowUp") targetX -= step;
@@ -317,7 +379,7 @@ export default function OrbCanvas({ onReady }: { onReady: () => void }) {
     const onScroll = () => {
       const bounds = element.getBoundingClientRect();
       const progress = Math.max(-1, Math.min(1, (window.innerHeight * 0.5 - bounds.top) / window.innerHeight));
-      scrollTurn = progress * 0.2;
+      scrollTurn = progress * 0.18;
       start();
     };
 
