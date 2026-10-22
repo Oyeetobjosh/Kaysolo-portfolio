@@ -36,8 +36,12 @@ export default function Nav() {
       <header className="fixed inset-x-0 top-0 z-[60] border-b border-black/10 bg-white/95 backdrop-blur-md">
         <div className="page-wrap flex h-[76px] items-center justify-between">
           <a href="#top" aria-label="Kaysolo home" data-cursor="HOME" className="group flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-black font-display text-lg font-bold text-white transition-transform duration-300 group-hover:rotate-6">
-              K
+            <span className="h-11 w-11 shrink-0 overflow-hidden rounded-full ring-1 ring-black/15 transition-transform duration-300 group-hover:scale-105">
+              <img
+                src="/avatar.jpg"
+                alt="Kaysolo portrait"
+                className="h-full w-full object-cover object-center"
+              />
             </span>
             <span className="font-display text-lg font-semibold tracking-tight">Kaysolo</span>
           </a>
