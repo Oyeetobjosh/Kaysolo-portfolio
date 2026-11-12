@@ -3,8 +3,9 @@ import Magnetic from "../components/Magnetic";
 
 const socials = [
   { label: "Behance", href: "https://www.behance.net/odewolekehinde" },
-  { label: "X / Twitter", href: "https://twitter.com/Kaysolo_1" },
-  { label: "Email", href: "mailto:hello@kaysolo.design" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/kehinde-odewole-817643285?utm_source=share_via&utm_content=profile&utm_medium=member_android" },
+  { label: "X / Twitter", href: "https://x.com/kaysolo58" },
+  { label: "Email", href: "mailto:kehindeodewole90@gmail.com" },
 ];
 
 export default function Contact() {
@@ -37,14 +38,14 @@ export default function Contact() {
               Looking for a thoughtful designer for your next idea? Send a note or explore the work on Behance.
             </p>
             <Magnetic className="mt-6 w-fit" strength={0.2}>
-              <a href="mailto:hello@kaysolo.design" data-cursor="EMAIL" className="button-dark">
+              <a href="mailto:kehindeodewole90@gmail.com" data-cursor="EMAIL" className="button-dark">
                 Start a conversation <span aria-hidden="true">↗</span>
               </a>
             </Magnetic>
           </motion.div>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 border-y border-black/10 sm:grid-cols-3">
+        <div className="mt-16 grid grid-cols-1 border-y border-black/10 sm:grid-cols-4">
           {socials.map((social, index) => {
             const external = social.href.startsWith("http");
             return (
